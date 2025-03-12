@@ -5,8 +5,8 @@
 <p>O projeto é feito com base em 4 partes: </p>
 
 <ul>
-  <ul>Criação de um crud.</ul>
-  <ul>Segunda parte.</ul>
-  <ul>Terceira parte.</ul>
-  <ul>Quarta parte.</ul>
+  <li>Criação de um crud.</li>
+  <li>Segunda parte.</li>
+  <li>Terceira parte.</li>
+  <li>Quarta parte.</li>
 </ul>
