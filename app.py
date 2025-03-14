@@ -37,6 +37,12 @@ def calcular_idade(data_nascimento):
     idade = today.year - nascimento.year -((today.month, today.day)<(nascimento.month, nascimento.day))
     return idade
 
+def validar_data(data):
+    try:
+        return datetime.strptime(data, "%Y-%m-%d")
+    except ValueError:
+        return None
+    
 # ROTAS⬇️
 
 @app.route('/professores', methods=['POST'])
@@ -51,6 +57,13 @@ def createProfessor():
     if erro:
         return jsonify(erro), status
     
+    data_nascimento = dados["data_nascimento"]
+    
+    if not isinstance(data_nascimento, str):
+        return jsonify({"erro": "A data de nascimento deve ser uma string no formato YYYY-MM-DD"})
+    
+    if validar_data(data_nascimento) is None:
+        return jsonify({"erro": "Formato de data inválido de ser YYYY-MM-DD"})    
     dados["idade"] = calcular_idade(dados["data_nascimento"])
 
     dados["id"] = id_professor
