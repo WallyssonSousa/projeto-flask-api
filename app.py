@@ -4,7 +4,6 @@ from datetime import datetime
 app = Flask(__name__)
 
 dici = {"professores":[]}
-
 id_professor = 1 # Contador para incrementação automatica do id_professor
 
 #FUNÇÕES A PARTE ⬇️
@@ -37,6 +36,7 @@ def calcular_idade(data_nascimento):
     idade = today.year - nascimento.year -((today.month, today.day)<(nascimento.month, nascimento.day))
     return idade
 
+# Função para validar formato YYYY-MM-DD
 def validar_data(data):
     try:
         return datetime.strptime(data, "%Y-%m-%d")
