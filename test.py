@@ -18,11 +18,9 @@ class TestStringMethods(unittest.TestCase):
         self.assertEqual(type(obj_retornado),type([]))
 
     def test_001_adiciona_professores(self):
-        #criar dois professores (usando post na url /professores)
         r = requests.post('http://localhost:5000/professores',json={'nome':'fernando','id':1})
         r = requests.post('http://localhost:5000/professores',json={'nome':'roberto','id':2})
-        
-        #pego a lista de professores (do mesmo jeito que no teste 0)
+
         r_lista = requests.get('http://localhost:5000/professores')
         lista_retornada = r_lista.json()#le o arquivo que o servidor respondeu
                                         #e transforma num dict/lista de python
