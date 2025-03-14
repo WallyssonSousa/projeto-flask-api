@@ -112,5 +112,13 @@ def updateProfessor(id):
         
     return jsonify({"erro": "Professor não encontrado!"}), 400
 
+@app.route('/professores/<int:id>', methods=['GET'])
+def getProfessorById(id):
+    dados = [professor for professor in dici["professores"] if professor["id"]==id]
+    
+    if dados:
+        return jsonify(dados), 200
+    return jsonify({"erro": "Professor não encontrado"}), 404    
+
 if __name__ == "__main__":
     app.run(debug=True)
