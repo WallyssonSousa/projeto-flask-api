@@ -5,28 +5,46 @@ app = Flask(__name__)
 
 dici = {"professores":[]}
 
-id_professor = 1
+id_professor = 1 # Contador para incrementação automatica do id_professor
 
+#FUNÇÕES A PARTE ⬇️
 
+# Função para verificar campos obrigatórios
 def validar_campos_obrigatorios(dados, campos_obrigatorios):
-    if not campos_obrigatorios.issubset(dados.keys()):
-        return {"erro": "Faltam campos obrigatórios!"}, 400 #Verificação = campos obrigatório faltando
-    if set(dados.keys()) != campos_obrigatorios:
-        return {"erro": "Campos inválidos no JSON!"}, 400 # Verificação = os campos
-                                                          # são diferentes dos obrigatórios ou a mais
-    return None, 200 #verificação = OK
 
+    campos_recebidos = set(dados.keys())
+    campos_faltando = campos_obrigatorios - campos_recebidos
+    campos_extras = campos_recebidos - campos_obrigatorios
+    
+    if campos_faltando:
+        return {                            
+            "erro": "Faltam campos obrigatórios",   
+            "campos_faltando": list(campos_faltando)
+        }, 400 # verificação de campos faltando                       
+        
+    if campos_extras:
+        return {
+            "erro": "Campos inválidos no JSON",
+            "campos_invalidos": list(campos_extras)
+        }, 400 #verificação de campos extras
+        
+    return None, 200 #verificação OK
+
+#função para calcular idade automaticamente
 def calcular_idade(data_nascimento):
     today = datetime.today()
     nascimento = datetime.strptime(data_nascimento, "%Y-%m-%d")
     idade = today.year - nascimento.year -((today.month, today.day)<(nascimento.month, nascimento.day))
     return idade
 
+# ROTAS⬇️
 
 @app.route('/professores', methods=['POST'])
 def createProfessor():
-    global id_professor
+    global id_professor # Puxa o contador global
+
     dados = request.json
+
     campos_obrigatórios = {"nome", "data_nascimento", "disciplina", "salario", "observacoes"}
      
     erro, status = validar_campos_obrigatorios(dados, campos_obrigatórios)
@@ -37,6 +55,7 @@ def createProfessor():
 
     dados["id"] = id_professor
     
+    # Verificação se ID ja cadastrado
     for professor in dici["professores"]:
         if professor["id"] == dados["id"]:
             return jsonify({"erro": "ID de professor já está cadastrado!"}), 400
@@ -51,6 +70,34 @@ def createProfessor():
 def getProfessores():
     return jsonify(dici["professores"])
 
+@app.route('/professores/<int:id>', methods=['PUT'])
+def updateProfessor(id):
+    dados = request.json
+    campos_permitidos = {"nome", "data_nascimento", "disciplina", "salario", "observacoes"}
+
+    # Verifica se há campos inválidos
+    campos_invalidos = [chave for chave in dados.keys() if chave not in campos_permitidos]
+
+    # Verifica a tentaiva de alterar ID do professor
+    if "id" in dados:
+        return jsonify({"erro": "O ID do professor não pode ser alterado"}), 400
+
+    # Verifica se existem campos inválidos
+    if campos_invalidos:
+        return jsonify({
+            "erro": "Os seguintes campos não podem ser alterados",
+            "campos_invalidos": campos_invalidos
+            }), 400
+
+    # Atualiza os dados do professor
+    for professor in dici['professores']:
+        if professor['id'] == id:
+            dados_filtrados = {chave: valor for chave, valor in dados.items() if chave in campos_permitidos}
+
+            professor.update(dados_filtrados)
+            return jsonify(professor), 200
+        
+    return jsonify({"erro": "Professor não encontrado!"}), 400
 
 if __name__ == "__main__":
     app.run(debug=True)
