@@ -120,5 +120,14 @@ def getProfessorById(id):
         return jsonify(dados), 200
     return jsonify({"erro": "Professor não encontrado"}), 404    
 
+@app.route('/professores/<int:id>', methods=['DELETE'])
+def deleteProfessorById(id):
+    dados = [professor for professor in dici["professores"] if professor["id"]==id]
+    
+    if dados:
+        dici["professores"].remove(dados[0])
+        return jsonify({"erro": "Professor removido"}), 200
+    return jsonify({"erro": "Professor não encontrado"})
+        
 if __name__ == "__main__":
     app.run(debug=True)
