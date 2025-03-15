@@ -129,5 +129,85 @@ def deleteProfessorById(id):
         return jsonify({"erro": "Professor removido"}), 200
     return jsonify({"erro": "Professor não encontrado"})
         
+
+
+#--------------------------------------------------------------------------------------------------------
+
+#                                      CRIANDO CRUD DE TURMAS - LUAN
+
+#--------------------------------------------------------------------------------------------------------
+
+# Lista de todas as turmas salvas
+dados_turmas = [{'turma_id':1,
+                 'descricao':'Matemática',
+                 'professor_id':3,
+                 'ativo': True}]
+
+# rota para listar todas as turmas
+@app.route('/api/turmas', methods=['GET'])
+def get_turmas():
+    return jsonify(dados_turmas)
+
+# rota para buscar uma turma pelo ID
+@app.route('/api/turmas/<int:turma_id>', methods=['GET'])
+def get_turma_por_id(turma_id):
+    turma = None
+    for i in dados_turmas:
+        if i['turma_id'] == turma_id:
+            turma = i
+            break
+# verifica se o ID de turma é um ID existente
+    if turma:
+        return jsonify(turma), 200
+    else:
+        return jsonify({"error": "Turma nao encontrada"}), 404
+
+
+@app.route('/api/turmas', methods=['POST'])
+def add_turma():
+    #recebendo os dados 
+    nova_turma = request.get_json()
+    if not nova_turma:
+        return jsonify({"Error": "Nenhum dado foi inserido"}), 400
+
+# Verifica se nenhum campo de turmas está vazio 
+    campos_obrigatorios = ['descricao', 'professor_id', 'ativo']
+    campos_nao_preenchidos = []
+    for campo in campos_obrigatorios:
+        if campo not in nova_turma:
+                campos_nao_preenchidos.append(campo)
+    if campos_nao_preenchidos:
+        return jsonify({
+            "error": "Os seguintes campos estão ausentes:",
+            "campos_nao_preenchidos": campos_nao_preenchidos
+        }), 400 
+    
+# Incrementa automaticamente o ID da turma que irá ser adicionada de acordo com o id ultima turma da lista e soma mais 1. 
+# Caso a lista não tiver a  ultima posição(vazia) iniciará  com 1.
+    if dados_turmas:
+        nova_turma['turma_id'] = dados_turmas[-1]['turma_id'] + 1
+    else:
+        nova_turma['turma_id'] = 1
+        
+# adicionando turma a lista de turmas
+
+    dados_turmas.append(nova_turma)
+    return jsonify({"mensagem": "Nova turma adicionada!", "turma": nova_turma}), 201
+
+#--------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 if __name__ == "__main__":
     app.run(debug=True)
