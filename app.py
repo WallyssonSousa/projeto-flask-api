@@ -2,10 +2,10 @@ from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-# Simulação de banco de dados
+
 alunos = []
 
-# ------------------- ALUNOS -------------------
+# comceçando o rpojeto 
 
 # Rota de listagem de alunos
 @app.route('/alunos', methods=['GET'])
@@ -15,12 +15,12 @@ def get_alunos():
 # Rota de detalhes do aluno
 @app.route('/alunos/<int:idAluno>', methods=['GET'])
 def get_aluno(idAluno):
-    aluno = next((a for a in alunos if a['id'] == idAluno), None)
+    aluno = next((a for a in alunos if a['id'] == idAluno), None) #busca aluno pelo id 
     if aluno:
         return jsonify(aluno), 200
     return jsonify({"error": "Aluno não encontrado!"}), 404
 
-# Rota de criação de aluno
+# Rota de criação de aluno, 
 @app.route('/alunos', methods=['POST'])
 def add_aluno():
     data = request.json
@@ -34,17 +34,17 @@ def add_aluno():
     alunos.append(data)
     return jsonify({"message": "Aluno adicionado!"}), 201
 
-# Rota de atualização de aluno
+# Rota de atualização de aluno, 
 @app.route('/alunos/<int:idAluno>', methods=['PUT'])
 def update_aluno(idAluno):
     data = request.json
     for aluno in alunos:
         if aluno['id'] == idAluno:
-            aluno.update(data)
+            aluno.update(data) 
             return jsonify({"message": "Aluno atualizado!"}), 200
     return jsonify({"error": "Aluno não encontrado!"}), 404
 
-# Rota de deletar aluno
+# Rota de deletar aluno , utilizando global p todos 
 @app.route('/alunos/<int:idAluno>', methods=['DELETE'])
 def delete_aluno(idAluno):
     global alunos
