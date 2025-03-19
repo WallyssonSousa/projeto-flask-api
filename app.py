@@ -97,17 +97,18 @@ def updateProfessor(id):
     if not professor:
         return jsonify({"erro": "Professor não encontrado"}), 404
 
-    # Se a data de nascimento foi atualizada, recalcula a idade
+    # Se a data de nascimento foi atualizada, recalcula a idade e armazena no professor
     if "data_nascimento" in dados:
         nova_data_nascimento = dados["data_nascimento"]
         if not validar_data(nova_data_nascimento):
             return jsonify({"erro": "Formato de data inválido, use YYYY-MM-DD"}), 400
         
-        dados["idade"] = calcular_idade(nova_data_nascimento)
+        professor["data_nascimento"] = nova_data_nascimento
+        professor["idade"] = calcular_idade(nova_data_nascimento)  # Atualiza a idade correta no professor
 
-    # Atualiza os dados do professor com os campos permitidos
+    # Atualiza os outros campos permitidos
     for chave, valor in dados.items():
-        if chave in campos_permitidos:
+        if chave in campos_permitidos and chave != "data_nascimento":  # Já atualizamos acima
             professor[chave] = valor
 
     return jsonify(professor), 200
@@ -147,8 +148,10 @@ def getProfessorById(id):
 
     professor_formatado = {
         "id": professor["id"],
+        "data_nascimento": professor["data_nascimento"],
         "idade": professor["idade"],
-        "materia": professor["disciplina"],
+        "disciplina": professor["disciplina"],
+        "salario": professor["salario"],
         "nome": professor["nome"],
         "observacoes": professor["observacoes"],
         "turmas": [
@@ -244,7 +247,7 @@ def delete_turma(turma_id):
     turma = next((t for t in dados_turmas["turmas"] if t['id'] == turma_id), None)
     if turma:
         dados_turmas["turmas"].remove(turma)
-        return jsonify({"mensagem": "Turma removida com sucesso!"}), 200
+        return jsonify({"mensagem": "Turma removida"}), 200
     return jsonify({"error": "Turma não encontrada!"}), 404
 # ========================================= ROTAS ALUNOS ==========================================================#
 
@@ -346,6 +349,16 @@ def deleteAlunoById(id):
         return jsonify({"mensagem": "Aluno removido"}), 200
     return jsonify({"erro": "Aluno não encontrado"}), 404
 
+#========================================== RESETA ====================================================================#
+@app.route('/reseta', methods = ['POST'])
+def reseta():
+    global dados_alunos, dados_professores, dados_turmas
+    
+    dados_professores['professores'] = []
+    dados_turmas['turmas'] = []
+    dados_alunos['alunos'] = []
+    
+    return jsonify({"mensagem": "Todos os dados foram removidos"}), 200
 # ========================================== EXECUÇÃO ============================================================#
 
 if __name__ == "__main__":
