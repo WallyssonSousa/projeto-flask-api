@@ -68,6 +68,46 @@ def createProfessor():
 
     return jsonify(dados), 201
 
+@app.route('/professores/<int:id>', methods=['PUT'])
+def updateProfessor(id):
+    dados = request.json
+    campos_permitidos = {"nome", "data_nascimento", "disciplina", "salario", "observacoes"}
+
+    # Verifica se há campos inválidos
+    campos_invalidos = [chave for chave in dados.keys() if chave not in campos_permitidos]
+    
+    # Verifica a tentativa de alterar ID ou idade
+    if "id" in dados or "idade" in dados:
+        return jsonify({"erro": "O ID e a idade do professor não podem ser alterados"}), 400
+
+    # Verifica se existem campos inválidos
+    if campos_invalidos:
+        return jsonify({
+            "erro": "Os seguintes campos não podem ser alterados",
+            "campos_invalidos": campos_invalidos
+        }), 400
+
+    # Busca o professor para atualizar
+    professor = next((p for p in dados_professores["professores"] if p["id"] == id), None)
+    
+    if not professor:
+        return jsonify({"erro": "Professor não encontrado"}), 404
+
+    # Se a data de nascimento foi atualizada, recalcula a idade
+    if "data_nascimento" in dados:
+        nova_data_nascimento = dados["data_nascimento"]
+        if not validar_data(nova_data_nascimento):
+            return jsonify({"erro": "Formato de data inválido, use YYYY-MM-DD"}), 400
+        
+        dados["idade"] = calcular_idade(nova_data_nascimento)
+
+    # Atualiza os dados do professor com os campos permitidos
+    for chave, valor in dados.items():
+        if chave in campos_permitidos:
+            professor[chave] = valor
+
+    return jsonify(professor), 200
+
 @app.route('/professores', methods=['GET'])
 def getProfessores():
     for professor in dados_professores["professores"]:
