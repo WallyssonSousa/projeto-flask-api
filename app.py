@@ -3,7 +3,10 @@ from datetime import datetime
 
 app = Flask(__name__)
 
-dici = {"professores":[]}
+dados_professores = {"professores":[]}
+dados_turmas = {"turmas": []}
+dados_alunos = {"alunos": []}
+
 id_professor = 1 # Contador para incrementação automatica do id_professor
 
 #FUNÇÕES A PARTE ⬇️
@@ -43,7 +46,7 @@ def validar_data(data):
     except ValueError:
         return None
     
-# ROTAS⬇️
+# ======================================== ROTAS⬇️ =====================================================================#
 
 @app.route('/professores', methods=['POST'])
 def createProfessor():
@@ -69,19 +72,19 @@ def createProfessor():
     dados["id"] = id_professor
     
     # Verificação se ID ja cadastrado
-    for professor in dici["professores"]:
+    for professor in dados_professores["professores"]:
         if professor["id"] == dados["id"]:
             return jsonify({"erro": "ID de professor já está cadastrado!"}), 400
         
     id_professor += 1
 
-    dici["professores"].append(dados)
+    dados_professores["professores"].append(dados)
     
     return jsonify(dados), 201
 
 @app.route('/professores', methods=['GET'])
 def getProfessores():
-    return jsonify(dici["professores"])
+    return jsonify(dados_professores["professores"])
 
 @app.route('/professores/<int:id>', methods=['PUT'])
 def updateProfessor(id):
@@ -103,7 +106,7 @@ def updateProfessor(id):
             }), 400
 
     # Atualiza os dados do professor
-    for professor in dici['professores']:
+    for professor in dados_professores['professores']:
         if professor['id'] == id:
             dados_filtrados = {chave: valor for chave, valor in dados.items() if chave in campos_permitidos}
 
@@ -114,7 +117,7 @@ def updateProfessor(id):
 
 @app.route('/professores/<int:id>', methods=['GET'])
 def getProfessorById(id):
-    dados = [professor for professor in dici["professores"] if professor["id"]==id]
+    dados = [professor for professor in dados_professores["professores"] if professor["id"]==id]
     
     if dados:
         return jsonify(dados), 200
@@ -122,91 +125,100 @@ def getProfessorById(id):
 
 @app.route('/professores/<int:id>', methods=['DELETE'])
 def deleteProfessorById(id):
-    dados = [professor for professor in dici["professores"] if professor["id"]==id]
+    dados = [professor for professor in dados_professores["professores"] if professor["id"]==id]
     
     if dados:
-        dici["professores"].remove(dados[0])
+        dados_professores["professores"].remove(dados[0])
         return jsonify({"erro": "Professor removido"}), 200
     return jsonify({"erro": "Professor não encontrado"})
-        
 
-
-#--------------------------------------------------------------------------------------------------------
-
-#                                      CRIANDO CRUD DE TURMAS - LUAN
-
-#--------------------------------------------------------------------------------------------------------
-
-# Lista de todas as turmas salvas
-dados_turmas = [{'turma_id':1,
-                 'descricao':'Matemática',
-                 'professor_id':3,
-                 'ativo': True}]
-
-# rota para listar todas as turmas
-@app.route('/api/turmas', methods=['GET'])
+@app.route('/turmas', methods=['GET'])
 def get_turmas():
     return jsonify(dados_turmas)
 
-# rota para buscar uma turma pelo ID
-@app.route('/api/turmas/<int:turma_id>', methods=['GET'])
+@app.route('/turmas/<int:turma_id>', methods=['GET'])
 def get_turma_por_id(turma_id):
     turma = None
     for i in dados_turmas:
         if i['turma_id'] == turma_id:
             turma = i
             break
-# verifica se o ID de turma é um ID existente
     if turma:
         return jsonify(turma), 200
     else:
-        return jsonify({"error": "Turma nao encontrada"}), 404
+        return jsonify({"error": "Turma não encontrada"}), 404
 
-
-@app.route('/api/turmas', methods=['POST'])
+@app.route('/turmas', methods=['POST'])
 def add_turma():
-    #recebendo os dados 
     nova_turma = request.get_json()
     if not nova_turma:
         return jsonify({"Error": "Nenhum dado foi inserido"}), 400
 
-# Verifica se nenhum campo de turmas está vazio 
     campos_obrigatorios = ['descricao', 'professor_id', 'ativo']
     campos_nao_preenchidos = []
     for campo in campos_obrigatorios:
         if campo not in nova_turma:
-                campos_nao_preenchidos.append(campo)
+            campos_nao_preenchidos.append(campo)
     if campos_nao_preenchidos:
         return jsonify({
             "error": "Os seguintes campos estão ausentes:",
             "campos_nao_preenchidos": campos_nao_preenchidos
-        }), 400 
+        }), 400
+
+    # Verificando se o professor_id existe na lista de professores
+    professor_existente = False
+    for professor in dados_professores['professores']:
+        if professor['id'] == nova_turma['professor_id']:
+            professor_existente = True
+            break
     
-# Incrementa automaticamente o ID da turma que irá ser adicionada de acordo com o id ultima turma da lista e soma mais 1. 
-# Caso a lista não tiver a  ultima posição(vazia) iniciará  com 1.
+    if not professor_existente:
+        return jsonify({"error": "Professor com o ID fornecido não encontrado"}), 404
+
+    # Incrementa o ID da turma automaticamente
     if dados_turmas:
         nova_turma['turma_id'] = dados_turmas[-1]['turma_id'] + 1
     else:
         nova_turma['turma_id'] = 1
-        
-# adicionando turma a lista de turmas
 
+    # Adados_professoresonando a nova turma
     dados_turmas.append(nova_turma)
-    return jsonify({"mensagem": "Nova turma adicionada!", "turma": nova_turma}), 201
+    return jsonify({"mensagem": "Nova turma adados_professoresonada!", "turma": nova_turma}), 201
 
-#--------------------------------------------------------------------------------------------------------
+@app.route('/turmas/<int:turma_id>', methods=['PUT'])
+def update_turma(turma_id):
+    dados = request.get_json()
 
+    campos_permitidos = ['descricao', 'professor_id', 'ativo']
 
+    # Verifica se a turma existe
+    turma = next((t for t in dados_turmas if t['turma_id'] == turma_id), None)
+    if not turma:
+        return jsonify({"error": "Turma não encontrada!"}), 404
 
+    # Verifica se algum campo inválido foi enviado
+    campos_invalidos = [chave for chave in dados.keys() if chave not in campos_permitidos]
+    if campos_invalidos:
+        return jsonify({
+            "erro": "Os seguintes campos não podem ser alterados",
+            "campos_invalidos": campos_invalidos
+        }), 400
 
+    # Atualiza os dados da turma
+    turma.update({chave: valor for chave, valor in dados.items() if chave in campos_permitidos})
 
+    return jsonify(turma), 200
 
+@app.route('/turmas/<int:turma_id>', methods=['DELETE'])
+def delete_turma(turma_id):
+    turma = next((t for t in dados_turmas if t['turma_id'] == turma_id), None)
 
-
-
-
-
-
+    if turma:
+        dados_turmas.remove(turma)
+        return jsonify({"mensagem": "Turma removida com sucesso!"}), 200
+    else:
+        return jsonify({"error": "Turma não encontrada!"}), 404
+#========================================================================================================================#
 
 
 if __name__ == "__main__":
