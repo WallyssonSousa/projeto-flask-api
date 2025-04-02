@@ -207,3 +207,116 @@ class TestStringMethods(unittest.TestCase):
 
         # Verifica se o professor não é encontrado (status code 404)
         self.assertEqual(r_get.status_code, 404, "O professor não foi excluído corretamente")
+        
+    def test_011_alunos_GET(self):
+        r = requests.get('http://localhost:5000/alunos')
+        if r.status_code == 404:
+            self.fail("voce nao definiu a pagina /alunos no seu server")
+        try:
+            obj_retornado = r.json()
+        except:
+            self.fail("queria um json mas voce retornou outra coisa")
+        self.assertEqual(type(obj_retornado),type([]))
+        
+    def test_012_alunos_POST(self):
+        r = requests.post('http://localhost:5000/alunos',json={
+            "data_nascimento": "2007-08-17", 
+            "nome": "Caio",
+            "nota_primeiro_semestre": 9.5,
+            "nota_segundo_semestre": 1.75,
+            "turma_id": 1
+            })
+        
+        r = requests.post('http://localhost:5000/alunos',json={
+            "data_nascimento": "2000-05-14", 
+            "nome": "Hariel",
+            "nota_primeiro_semestre": 8.5,
+            "nota_segundo_semestre": 6.75,
+            "turma_id": 2
+        })
+
+        r_lista = requests.get('http://localhost:5000/alunos')
+        lista_retornada = r_lista.json()
+                                        
+        achei_Caio = False
+        achei_Hariel = False
+        
+        for aluno in lista_retornada:
+            if aluno['nome'] == 'Caio':
+                achei_Caio = True
+            if aluno['nome'] == 'Hariel':
+                achei_Hariel = True
+        
+        #se algum desses "achei" nao for True, dou uma falha
+        if not achei_Caio:
+            self.fail('Caio não foi encontrado')
+            print (f"{r_lista.json()}")
+        if not achei_Hariel:
+            self.fail('Hariel não foi encontrado') 
+        
+    def test_013_alunos_GetById(self):
+        r = requests.get('http://localhost:5000/alunos/1')
+        if r.status_code == 404:
+            self.fail("voce nao definiu uma rota para dar get pelo id do aluno")
+        try:
+            obj_retornado = r.json()
+        except:
+            self.fail("voce não retornou um JSON")
+        self.assertEqual(type(obj_retornado), type({}))
+        
+    def test_014_alunos_PUT(self):
+        # Define os novos dados para o aluno ID 1
+        novos_dados = {
+            "nome": "João Silva",
+            "data_nascimento": "2004-05-15",
+            "nota_primeiro_semestre": 8.5,
+            "nota_segundo_semestre": 9.0,
+            "turma_id": 2
+        }
+
+        # Faz a requisição PUT para atualizar o aluno ID 1
+        r = requests.put('http://localhost:5000/alunos/1', json=novos_dados)
+
+        # Verifica se a atualização foi bem-sucedida (status code 200)
+        self.assertEqual(r.status_code, 200, "Falha ao atualizar o aluno")
+
+        # Faz uma nova requisição GET para verificar se os dados foram atualizados
+        r_get = requests.get('http://localhost:5000/alunos/1')
+
+        # Verifica se o aluno ainda existe
+        self.assertEqual(r_get.status_code, 200, "Aluno não encontrado após atualização")
+
+        # Obtém o JSON retornado
+        aluno_atualizado = r_get.json()
+
+        # Compara os dados atualizados com os esperados
+        self.assertEqual(aluno_atualizado["nome"], novos_dados["nome"])
+        self.assertEqual(aluno_atualizado["data_nascimento"], novos_dados["data_nascimento"])
+        self.assertEqual(aluno_atualizado["nota_primeiro_semestre"], novos_dados["nota_primeiro_semestre"])
+        self.assertEqual(aluno_atualizado["nota_segundo_semestre"], novos_dados["nota_segundo_semestre"])
+        self.assertEqual(aluno_atualizado["turma_id"], novos_dados["turma_id"])
+        
+    def test_015_alunos_DELETE(self):
+        # Faz a requisição DELETE para excluir o professor ID 1
+        r = requests.delete('http://localhost:5000/alunos/1')
+
+        # Verifica se a exclusão foi bem-sucedida (status code 200)
+        self.assertEqual(r.status_code, 200, "Falha ao excluir o aluno")
+
+        # Verifica se a mensagem de sucesso está correta
+        resposta = r.json()
+        self.assertIn("mensagem", resposta)
+        self.assertEqual(resposta["mensagem"], "Aluno removido")
+
+        # Faz uma nova requisição GET para verificar se o professor foi realmente excluído
+        r_get = requests.get('http://localhost:5000/alunos/1')
+
+        # Verifica se o professor não é encontrado (status code 404)
+        self.assertEqual(r_get.status_code, 404, "O aluno não foi excluído corretamente")
+        
+def runTests():
+    suite = unittest.defaultTestLoader.loadTestsFromTestCase(TestStringMethods)
+    unittest.TextTestRunner(verbosity=2,failfast=True).run(suite)
+
+if __name__ == '__main__':
+    runTests()
