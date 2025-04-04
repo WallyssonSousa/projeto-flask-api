@@ -50,7 +50,6 @@ def calcular_media_final(nota_primeiro_semestre, nota_segundo_semestre):
 # ======================================== ROTAS PROFESSORES ============================================================#
 
 @app.route('/professores', methods=['POST'])
-@app.route('/professores', methods=['POST'])
 def createProfessor():
     global id_professor
 
