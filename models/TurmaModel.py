@@ -104,7 +104,7 @@ def turma_PUT(turma_id):
 
 
 
-def delete_turma(turma_id):
+def turma_DELETE(turma_id):
     turma = None
     for t in dados['turmas']:
         if t['id'] == turma_id:
