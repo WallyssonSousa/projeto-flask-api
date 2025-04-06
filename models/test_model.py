@@ -114,7 +114,7 @@ class TestStringMethods(unittest.TestCase):
 
         # Verifica se o professor não é encontrado (status code 404)
         self.assertEqual(r_get.status_code, 404, "O professor não foi excluído corretamente")
-        
+
     def test_006_turmas_GET(self):
         r = requests.get('http://localhost:5000/turmas')
         if r.status_code == 404:
