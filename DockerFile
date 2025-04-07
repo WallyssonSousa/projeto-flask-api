@@ -1,0 +1,22 @@
+# Imagem base oficial do Python
+FROM python:3.11-slim
+
+# Diretório de trabalho dentro do container
+WORKDIR /app
+
+# Copia os arquivos da raiz "./" para o container em "./app"
+COPY . /app
+
+# Instala as dependências do projeto
+RUN pip install --upgrade pip
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Evitar buffer
+ENV PYTHONUNBUFFERED=1
+
+# Exposição da porta que o Flask usa
+EXPOSE 5000
+
+# Comando para rodar a aplicação com auto-reload
+CMD ["python", "-m", "flask", "run", "--host=0.0.0.0", "--reload"]
+
