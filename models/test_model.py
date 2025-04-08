@@ -1,4 +1,4 @@
-import requests
+import requests, datetime
 import unittest
 
 class TestStringMethods(unittest.TestCase):
