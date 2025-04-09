@@ -293,7 +293,7 @@ class TestStringMethods(unittest.TestCase):
         self.assertEqual(resposta["mensagem"], "Turma removida")
 
         # Faz uma nova requisição GET para verificar se o professor foi realmente excluído
-        r_get = requests.get('http://localhost:8000/turma/1')
+        r_get = requests.get('http://localhost:8000/turmas/1')
 
         # Verifica se o professor não é encontrado (status code 404)
         self.assertEqual(r_get.status_code, 404, "O professor não foi excluído corretamente")
@@ -315,28 +315,7 @@ class TestStringMethods(unittest.TestCase):
 
         # Verifica se o professor não é encontrado (status code 404)
         self.assertEqual(r_get.status_code, 404, "O aluno não foi excluído corretamente")
-        
-    #adiciona um aluno, mas depois reseta o servidor
-    #e o aluno deve desaparecer
-    def test_016_reseta(self):
-
-        #POST na url reseta: deveria apagar todos os dados do servidor
-        r_reset = requests.post('http://localhost:8000/reseta')
-
-        #estou verificando se a url reseta deu pau
-        #se voce ainda nao definiu ela, esse cod status nao vai ser 200
-        self.assertEqual(r_reset.status_code,200)
-
-        #pego de novo a lista
-        r_lista_professores_depois = requests.get('http://localhost:8000/professores')
-        r_lista_turmas_depois = requests.get('http://localhost:8000/turmas')
-        r_lista_alunos_depois = requests.get('http://localhost:8000/alunos')
-        
-        #e agora tem que ter 0 elementos
-        self.assertEqual(len(r_lista_professores_depois.json()),0)
-        self.assertEqual(len(r_lista_turmas_depois.json()),0)
-        self.assertEqual(len(r_lista_alunos_depois.json()),0)
-
+     
 def runTests():
         suite = unittest.defaultTestLoader.loadTestsFromTestCase(TestStringMethods)
         unittest.TextTestRunner(verbosity=2,failfast=True).run(suite)

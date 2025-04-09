@@ -25,5 +25,5 @@ def turma_DELETE(turma_id):
     turma = turma_get_id(turma_id)
     if turma:
         dados_turmas["turmas"].remove(turma)
-        return True
-    return False
+        return {"mensagem": "Turma removida"}, 200
+    return {"erro": "Turma não encontrada"}, 404

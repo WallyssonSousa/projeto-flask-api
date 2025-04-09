@@ -8,20 +8,20 @@ from models.ProfessorModel import (
 )
 from utils.FucoesValidacao import validar_data, calcular_idade, validar_campos_obrigatorios
 
-professor_bp = Blueprint('professores', __name__)
+professor_bp = Blueprint('/professores', __name__)
 
-@professor_bp.route('', methods=['GET'])
+@professor_bp.route('/professores', methods=['GET'])
 def listar_professores():
     return jsonify(get_todos_professores())
 
-@professor_bp.route('/<int:prof_id>', methods=['GET'])
+@professor_bp.route('/professores/<int:prof_id>', methods=['GET'])
 def get_id_professor(prof_id):
     professor = get_professor_por_id(prof_id)
     if not professor:
         return jsonify({"erro": "Professor nao encontrado"}), 404
     return jsonify(professor)
 
-@professor_bp.route('', methods=['POST'])
+@professor_bp.route('/professores', methods=['POST'])
 def post_professor():
     dados = request.json
     campos_obrigatorios = {"nome", "data_nascimento", "disciplina", "salario", "observacoes"}
@@ -38,7 +38,7 @@ def post_professor():
 
     return jsonify(novo_professor), 201
 
-@professor_bp.route('/<int:prof_id>', methods=['PUT'])
+@professor_bp.route('/professores/<int:prof_id>', methods=['PUT'])
 def update_professor_route(prof_id):
     dados = request.json
     campos_permitidos = {"nome", "data_nascimento", "disciplina", "salario", "observacoes"}
@@ -61,7 +61,7 @@ def update_professor_route(prof_id):
     professor_atualizado = atualizar_professor(prof_id, dados)
     return jsonify(professor_atualizado)
 
-@professor_bp.route('/<int:prof_id>', methods=['DELETE'])
+@professor_bp.route('/professores/<int:prof_id>', methods=['DELETE'])
 def delete_professor_route(prof_id):
     if deletar_professor(prof_id):
         return jsonify({"mensagem": "Professor removido"}), 200
