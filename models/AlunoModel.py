@@ -1,4 +1,4 @@
-from utils import calcular_idade, calcular_media_final, validar_data
+from utils.FucoesValidacao import calcular_idade, calcular_media_final, validar_data
 
 dados_alunos = {"alunos": []}
 id_aluno = 1
@@ -41,6 +41,7 @@ def atualizar_aluno(aluno_id, dados, dados_turmas):
 
     if "data_nascimento" in dados:
         dados["idade"] = calcular_idade(dados["data_nascimento"])
+
     if "nota_primeiro_semestre" in dados and "nota_segundo_semestre" in dados:
         dados["media_final"] = calcular_media_final(dados["nota_primeiro_semestre"], dados["nota_segundo_semestre"])
 

@@ -6,7 +6,7 @@ from models.ProfessorModel import (
     atualizar_professor,
     deletar_professor
 )
-from utils import validar_data, calcular_idade, validar_campos_obrigatorios
+from utils.FucoesValidacao import validar_data, calcular_idade, validar_campos_obrigatorios
 
 professor_bp = Blueprint('professores', __name__)
 
