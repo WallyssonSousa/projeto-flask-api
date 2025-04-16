@@ -22,24 +22,12 @@ projeto/
 
 ## Como Rodar o Projeto (Via Docker)
 ### 🔨 Fazendo o build da imagem
-- **Usando docker build (sem docker-compose):**
-```sh
-docker build -t flask-api:1.0 .
-```
 - **Usando docker-compose build:**
 ```sh
 docker-compose build
 ```
 Isso usará o build definido no docker-compose.yml, criará a imagem flask-api:1.0 e já prepara tudo pro up.
 ### 🚀 Rodando a aplicação
-- **Usando docker (sem docker-compose):**
-```sh
-docker run -p 5000:5000 flask-api:1.0 .
-```
-ou em modo "background":
-```sh
-docker run -d -p 5000:5000 flask-api:1.0 .
-```
 - **Usando docker-compose:**
 ```sh
 docker-compose up
@@ -49,15 +37,6 @@ ou em modo "background":
 docker-compose up -d
 ```
 ### ⛔ Parando a aplicação:
-- **Usando docker (sem docker-compose):**
-```sh
-Ctrl+C
-```
-ou em modo "background":
-```sh
-docker ps
-docker stop {CONTAINER_ID}
-```
 - **Usando docker-compose:**
 ```sh
 Ctrl+C
@@ -67,11 +46,6 @@ ou em modo "background":
 docker-compose down
 ```
 ### ❌ Apagando a imagem:
-**Usando docker (sem docker-compose):**
-```sh
-docker ps
-docker rmi flask-api:1.0
-```
 **Usando docker-compose:**
 ```sh
 docker-compose down --rmi all
