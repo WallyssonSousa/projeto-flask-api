@@ -7,7 +7,7 @@ turma_bp = Blueprint('turma_bp', __name__)
 
 @turma_bp.route('/turmas', methods=['GET'])
 @jwt_required()
-def listar_turmas():
+def get_turmas():
     try:
         return jsonify(turmas_get()), 200
     except Exception as e:
@@ -15,7 +15,7 @@ def listar_turmas():
 
 @turma_bp.route('/turmas/<int:turma_id>', methods=['GET'])
 @jwt_required()
-def obter_turma(turma_id):
+def get_turma_by_id(turma_id):
     try:
         turma = turma_get_id(turma_id)
         if turma is None:
@@ -26,7 +26,7 @@ def obter_turma(turma_id):
 
 @turma_bp.route('/turmas', methods=['POST'])
 @jwt_required()
-def criar_turma():
+def create_turma():
     user = get_jwt()
     if user.get("role") != "admin":
         return jsonify({"erro": "Acesso negado: apenas administradores podem criar novas turmas"}), 403
@@ -42,11 +42,17 @@ def criar_turma():
         return jsonify(turma), 201
     except Exception as e:
         return jsonify({"erro": f"Erro ao criar turma: {str(e)}"}), 500
+    nova_turma = request.json
+    campos_obrigatorios = {"nome", "turno", "professor_id"}
+    
+    erro, status = validar_campos_obrigatorios(nova_turma, campos_obrigatorios)
+    if erro:
+        return jsonify(erro), status
 
 # Rota para atualizar uma turma existente
 @turma_bp.route('/turmas/<int:turma_id>', methods=['PUT'])
 @jwt_required()
-def atualizar_turma(turma_id):
+def update_turma(turma_id):
     user = get_jwt()
     if user.get("role") != "admin":
         return jsonify({"erro": "Acesso negado: apenas administradores podem atualizar turmas existentes"}), 403
@@ -66,7 +72,7 @@ def atualizar_turma(turma_id):
 # Rota para deletar uma turma
 @turma_bp.route('/turmas/<int:turma_id>', methods=['DELETE'])
 @jwt_required()
-def deletar_turma(turma_id):
+def delete_turma(turma_id):
     user = get_jwt()
     if user.get("role") != "admin":
         return jsonify({"erro": "Acesso negado: apenas administradores podem excluir turmas existentes"}), 403

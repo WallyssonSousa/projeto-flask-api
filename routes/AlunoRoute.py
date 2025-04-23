@@ -32,7 +32,6 @@ def create_aluno():
 
     return jsonify(aluno), status
 
-
 @aluno_bp.route('/alunos/<int:id>', methods=['PUT'])
 @jwt_required()
 def update_aluno(id):
@@ -55,7 +54,6 @@ def update_aluno(id):
         return jsonify({"erro": f"Ocorreu um erro ao atualizar o aluno: {str(e)}"}), 500
 
     return jsonify(aluno), status
-
 
 @aluno_bp.route('/alunos', methods=['GET'])
 @jwt_required()
@@ -90,4 +88,3 @@ def delete_aluno(id):
         return jsonify({"erro": f"Ocorreu um erro ao excluir o aluno: {str(e)}"}), 500
 
     return jsonify(resultado), status
-

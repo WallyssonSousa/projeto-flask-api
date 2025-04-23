@@ -4,10 +4,39 @@ from config import app
 from datetime import datetime
 
 class TestStringMethods(unittest.TestCase):
+    
+    def setUp(self):
+        #Define a URL base da API com base na config do app (ex: http://localhost:5000)
+        self.base_url = f'http://127.0.0.1:5000'
+        
+        #chama o meotodo get_token() para autenticar e armazenar o token JWT
+        self.token = self.get_token()
+
+    #Metodo para fazer login e obter o token de acesso JWT
+    def get_token(self):
+        # Daods de login para o user admin (podem-se alterar para outro usuario)
+        login_payload = {
+            "username": "admin",
+            "password": "senha123"
+        }
+        
+        #Envia uma requisição POST para a rota /login com os dados de login
+        response = requests.post(f'{self.base_url}/auth/login', json=login_payload)
+        
+        #verifica se o teste de OK (200), se não o teste falaha
+        self.assertEqual(response.status_code, 200, "Falha ao autenticar e obter token")
+        
+        #retorna apenas o acess_token do JSON de resposta
+        return response.json()["access_token"]
 
 #====================================== TESTES GET ======================================================#
     def test_001_professores_GET(self):
-        r = requests.get(f'{app.config["HOST"]}:{app.config["PORT"]}/professores')
+        #Define o cabeçalho com o token JWT para autenticação
+        headers = {"Authorization": f"Bearer {self.token}"}
+        
+        #Envia uma requisição GET autenticada para a rota /professores
+        r = requests.get(f'{self.base_url}/professores', headers=headers)
+        
         if r.status_code == 404:
             self.fail("voce nao definiu a pagina /professores no seu server")
         try:
