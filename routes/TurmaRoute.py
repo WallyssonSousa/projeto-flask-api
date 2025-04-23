@@ -31,23 +31,12 @@ def create_turma():
     if user.get("role") != "admin":
         return jsonify({"erro": "Acesso negado: apenas administradores podem criar novas turmas"}), 403
 
-    try:
-        nova_turma = request.get_json()
-        if not nova_turma:
-            return jsonify({"erro": "Dados ausentes ou inválidos"}), 400 #Tratamento de erro 
-        
-        #validar_campos_obrigatorios()
-
-        turma = turma_post(nova_turma)
-        return jsonify(turma), 201
-    except Exception as e:
-        return jsonify({"erro": f"Erro ao criar turma: {str(e)}"}), 500
     nova_turma = request.json
-    campos_obrigatorios = {"nome", "turno", "professor_id"}
-    
+    campos_obrigatorios = ["nome", "ano", "semestre", "curso_id"]
+
     erro, status = validar_campos_obrigatorios(nova_turma, campos_obrigatorios)
     if erro:
-        return jsonify(erro), status
+        return jsonify({"erro": erro}), status
 
 # Rota para atualizar uma turma existente
 @turma_bp.route('/turmas/<int:turma_id>', methods=['PUT'])
