@@ -13,7 +13,7 @@ professor_bp = Blueprint('professores', __name__)
 
 @professor_bp.route('/professores', methods=['GET'])
 @jwt_required()
-def listar_professores():
+def get_professores():
     try:
         professores = get_todos_professores()
         return jsonify(professores), 200
@@ -22,7 +22,7 @@ def listar_professores():
 
 @professor_bp.route('/professores/<int:prof_id>', methods=['GET'])
 @jwt_required()
-def get_id_professor(prof_id):
+def get_professor_by_id(prof_id):
     try:
         professor = get_professor_por_id(prof_id)
         if not professor:
@@ -33,7 +33,7 @@ def get_id_professor(prof_id):
 
 @professor_bp.route('/professores', methods=['POST'])
 @jwt_required()
-def post_professor():
+def create_professor():
     jwt_claims = get_jwt()
     if jwt_claims.get("role") != "admin":
         return jsonify({"erro": "Acesso negado: apenas administradores podem criar professores"}), 403
@@ -57,7 +57,7 @@ def post_professor():
 
 @professor_bp.route('/professores/<int:prof_id>', methods=['PUT'])
 @jwt_required()
-def update_professor_route(prof_id):
+def update_professor(prof_id):
     jwt_claims = get_jwt()
     if jwt_claims.get("role") != "admin":
         return jsonify({"erro": "Acesso negado: apenas administradores podem atualizar professores"}), 403
@@ -88,7 +88,7 @@ def update_professor_route(prof_id):
 
 @professor_bp.route('/professores/<int:prof_id>', methods=['DELETE'])
 @jwt_required()
-def delete_professor_route(prof_id):
+def delete_professor(prof_id):
     jwt_claims = get_jwt()
     if jwt_claims.get("role") != "admin":
         return jsonify({"erro": "Acesso negado: apenas administradores podem excluir professores"}), 403
