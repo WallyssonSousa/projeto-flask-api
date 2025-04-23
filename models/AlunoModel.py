@@ -31,7 +31,7 @@ def atualizar_aluno(aluno_id, dados, dados_turmas):
         return {"erro": "Aluno não encontrado"}, 404
 
     if "id" in dados or "idade" in dados:
-        return {"erro": "O ID e a idade do aluno não podem ser alterados"}, 400
+        {"erro": "O ID e a idade do aluno não podem ser alterados"}, 400
 
     if not any(t["id"] == dados["turma_id"] for t in dados_turmas["turmas"]):
         return {"erro": "Turma com ID fornecido não encontrada"}, 404
@@ -56,3 +56,5 @@ def deletar_aluno(aluno_id):
         return {"erro": "Aluno não encontrado"}, 404
     dados_alunos["alunos"].remove(aluno)
     return {"mensagem": "Aluno removido"}, 200
+
+

@@ -64,7 +64,6 @@ class TestStringMethods(unittest.TestCase):
             if professor['nome'] == 'Enrico':
                 achei_enrico = True
         
-        #se algum desses "achei" nao for True, dou uma falha
         if not achei_nicolas:
             self.fail('aluno Nicolas nao apareceu na lista de professores')
         if not achei_enrico:

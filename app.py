@@ -6,17 +6,23 @@ from routes.ProfessorRoute import professor_bp
 from routes.TurmaRoute import turma_bp
 from routes.AuthRoute import auth_bp
 from flask_jwt_extended import JWTManager
+from flask_sqlalchemy import SQLAlchemy
 
 load_dotenv()
 
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+db = SQLAlchemy(app)
 jwt = JWTManager(app)
 
 app.register_blueprint(auth_bp, url_prefix='/auth')
 app.register_blueprint(aluno_bp, url_prefix='/aluno')
 app.register_blueprint(professor_bp, url_prefix='/professor')
 app.register_blueprint(turma_bp, url_prefix='/turma')
+
+
 
 if __name__ == '__main__':
     app.run(

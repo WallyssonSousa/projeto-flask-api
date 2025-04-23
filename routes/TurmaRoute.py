@@ -1,10 +1,10 @@
 from flask import Blueprint, request, jsonify
 from models.TurmaModel import turmas_get, turma_get_id, turma_post, turma_PUT, turma_DELETE
 from flask_jwt_extended import jwt_required, get_jwt
+from utils.FucoesValidacao import validar_campos_obrigatorios
 
 turma_bp = Blueprint('turma_bp', __name__)
 
-# Rota para listar todas as turmas
 @turma_bp.route('/turmas', methods=['GET'])
 @jwt_required()
 def listar_turmas():
@@ -13,7 +13,6 @@ def listar_turmas():
     except Exception as e:
         return jsonify({"erro": f"Erro ao listar turmas: {str(e)}"}), 500
 
-# Rota para obter uma turma específica pelo ID
 @turma_bp.route('/turmas/<int:turma_id>', methods=['GET'])
 @jwt_required()
 def obter_turma(turma_id):
@@ -25,7 +24,6 @@ def obter_turma(turma_id):
     except Exception as e:
         return jsonify({"erro": f"Erro ao obter turma: {str(e)}"}), 500
 
-# Rota para adicionar uma nova turma
 @turma_bp.route('/turmas', methods=['POST'])
 @jwt_required()
 def criar_turma():
@@ -36,7 +34,9 @@ def criar_turma():
     try:
         nova_turma = request.get_json()
         if not nova_turma:
-            return jsonify({"erro": "Dados ausentes ou inválidos"}), 400
+            return jsonify({"erro": "Dados ausentes ou inválidos"}), 400 #Tratamento de erro 
+        
+        #validar_campos_obrigatorios()
 
         turma = turma_post(nova_turma)
         return jsonify(turma), 201
