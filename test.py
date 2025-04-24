@@ -21,7 +21,7 @@ class TestStringMethods(unittest.TestCase):
         }
         
         #Envia uma requisição POST para a rota /login com os dados de login
-        response = requests.post(f'{self.base_url}/auth/login', json=login_payload)
+        response = requests.post(f'{self.base_url}/login', json=login_payload)
         
         #verifica se o teste de OK (200), se não o teste falaha
         self.assertEqual(response.status_code, 200, "Falha ao autenticar e obter token")
@@ -46,7 +46,8 @@ class TestStringMethods(unittest.TestCase):
         self.assertEqual(type(obj_retornado),type([]))
         
     def test_002_turmas_GET(self):
-        r = requests.get(f'{app.config["HOST"]}:{app.config["PORT"]}/turmas')
+        headers = {"Authorization": f"Bearer {self.token}"}
+        r = requests.get(f'{self.base_url}/turmas', headers=headers)
         if r.status_code == 404:
             self.fail("voce nao definiu a pagina /turmas no seu server")
         try:
@@ -56,7 +57,8 @@ class TestStringMethods(unittest.TestCase):
         self.assertEqual(type(obj_retornado),type([]))
         
     def test_003_alunos_GET(self):
-        r = requests.get(f'{app.config["HOST"]}:{app.config["PORT"]}/alunos')
+        headers = {"Authorization": f"Bearer {self.token}"}
+        r = requests.get(f'{self.base_url}/alunos', headers=headers)
         if r.status_code == 404:
             self.fail("voce nao definiu a pagina /alunos no seu server")
         try:
@@ -66,7 +68,8 @@ class TestStringMethods(unittest.TestCase):
         self.assertEqual(type(obj_retornado),type([]))
 
     def test_004_professores_POST(self):
-        r = requests.post(f'{app.config["HOST"]}:{app.config["PORT"]}/professores',json={
+        headers = {"Authorization": f"Bearer {self.token}"}
+        r = requests.post(f'{self.base_url}/professores', headers=headers, json={
             'nome':"Nicolas",
             'data_nascimento':"2006-04-11",
             'disciplina': "ADS",
@@ -74,7 +77,7 @@ class TestStringMethods(unittest.TestCase):
             'observacoes': "Nenhuma"
             })
         
-        r = requests.post(f'{app.config["HOST"]}:{app.config["PORT"]}/professores',json={
+        r = requests.post(f'{self.base_url}/professores', headers=headers, json={
             'nome':"Enrico",
             'data_nascimento':"2006-04-11",
             'disciplina': "CB",
@@ -82,7 +85,7 @@ class TestStringMethods(unittest.TestCase):
             'observacoes': "Nenhuma"
         })
 
-        r_lista = requests.get(f'{app.config["HOST"]}:{app.config["PORT"]}/professores')
+        r_lista = requests.get(f'{self.base_url}/professores', headers=headers)
         lista_retornada = r_lista.json()     
 
         achei_nicolas = False
@@ -99,30 +102,29 @@ class TestStringMethods(unittest.TestCase):
             self.fail('aluno Enrico nao apareceu na lista de professores')
                 
     def test_005_turmas_POST(self):
-        r = requests.post(f'{app.config["HOST"]}:{app.config["PORT"]}/turmas',json={
-            "descricao": "Nenhuma",
-            "materia": "API",
+        headers = {"Authorization": f"Bearer {self.token}"}
+        r = requests.post(f'{self.base_url}/turmas', headers=headers, json={
+            "nome": "API",
             "turno": "Matutino",
             "professor_id": 1
             })
         
-        r = requests.post(f'{app.config["HOST"]}:{app.config["PORT"]}/turmas',json={
-            "descricao": "Nenhuma",
-            "materia": "CYBER",
+        r = requests.post(f'{self.base_url}/turmas', headers=headers, json={
+            "nome": "CYBER",
             "turno": "Noturno",
             "professor_id": 2
         })
 
-        r_lista = requests.get(f'{app.config["HOST"]}:{app.config["PORT"]}/turmas')
+        r_lista = requests.get(f'{self.base_url}/turmas', headers=headers)
         lista_retornada = r_lista.json()
                                         
         achei_turma1 = False
         achei_turma2 = False
         
         for turma in lista_retornada:
-            if turma['materia'] == 'API':
+            if turma['nome'] == 'API':
                 achei_turma1 = True
-            if turma['materia'] == 'CYBER':
+            if turma['nome'] == 'CYBER':
                 achei_turma2 = True
         
         #se algum desses "achei" nao for True, dou uma falha
@@ -132,7 +134,8 @@ class TestStringMethods(unittest.TestCase):
             self.fail('Turma CYBER não foi encontrada')
 
     def test_006_alunos_POST(self):
-        r = requests.post(f'{app.config["HOST"]}:{app.config["PORT"]}/alunos',json={
+        headers = {"Authorization": f"Bearer {self.token}"}
+        r = requests.post(f'{self.base_url}/alunos', headers=headers, json={
             "data_nascimento": "2007-08-17", 
             "nome": "Caio",
             "nota_primeiro_semestre": 9.5,
@@ -140,7 +143,7 @@ class TestStringMethods(unittest.TestCase):
             "turma_id": 1
             })
         
-        r = requests.post(f'{app.config["HOST"]}:{app.config["PORT"]}/alunos',json={
+        r = requests.post(f'{self.base_url}/alunos', headers=headers, json={
             "data_nascimento": "2000-05-14", 
             "nome": "Hariel",
             "nota_primeiro_semestre": 8.5,
@@ -148,7 +151,7 @@ class TestStringMethods(unittest.TestCase):
             "turma_id": 2
         })
 
-        r_lista = requests.get(f'{app.config["HOST"]}:{app.config["PORT"]}/alunos')
+        r_lista = requests.get(f'{self.base_url}/alunos', headers=headers)
         lista_retornada = r_lista.json()
                                         
         achei_Caio = False
@@ -168,7 +171,8 @@ class TestStringMethods(unittest.TestCase):
             self.fail('Hariel não foi encontrado')
 
     def test_007_professores_GetById(self):
-        r = requests.get(f'{app.config["HOST"]}:{app.config["PORT"]}/professores/1')
+        headers = {"Authorization": f"Bearer {self.token}"}
+        r = requests.get(f'{self.base_url}/professores/1', headers=headers)
         if r.status_code == 404:
             self.fail("voce nao definiu uma rota para dar get pelo id do professor")
         try:
@@ -178,7 +182,8 @@ class TestStringMethods(unittest.TestCase):
         self.assertEqual(type(obj_retornado), type({}))
     
     def test_008_turmas_GetById(self):
-        r = requests.get(f'{app.config["HOST"]}:{app.config["PORT"]}/turmas/1')
+        headers = {"Authorization": f"Bearer {self.token}"}
+        r = requests.get(f'{self.base_url}/turmas/1', headers=headers)
         if r.status_code == 404:
             self.fail("voce nao definiu uma rota para dar get pelo id da turma")
         try:
@@ -188,7 +193,8 @@ class TestStringMethods(unittest.TestCase):
         self.assertEqual(type(obj_retornado), type({}))
         
     def test_009_alunos_GetById(self):
-        r = requests.get(f'{app.config["HOST"]}:{app.config["PORT"]}/alunos/1')
+        headers = {"Authorization": f"Bearer {self.token}"}
+        r = requests.get(f'{self.base_url}/alunos/1', headers=headers)
         if r.status_code == 404:
             self.fail("voce nao definiu uma rota para dar get pelo id do aluno")
         try:
@@ -198,6 +204,7 @@ class TestStringMethods(unittest.TestCase):
         self.assertEqual(type(obj_retornado), type({}))
         
     def test_010_professores_PUT(self):
+        headers = {"Authorization": f"Bearer {self.token}"}
         
         def calcular_idade(data_nascimento):
             today = datetime.today()
@@ -215,13 +222,13 @@ class TestStringMethods(unittest.TestCase):
         }
 
         # Faz a requisição PUT para atualizar o professor ID 1
-        r = requests.put(f'{app.config["HOST"]}:{app.config["PORT"]}/professores/1', json=novos_dados)
+        r = requests.put(f'{self.base_url}/professores/1', headers=headers, json=novos_dados)
 
         # Verifica se a atualização foi bem-sucedida (status code 200 ou 204)
         self.assertIn(r.status_code, [200, 204], "Falha ao atualizar o professor")
 
         # Faz uma nova requisição GET para verificar se os dados foram atualizados
-        r_get = requests.get(f'{app.config["HOST"]}:{app.config["PORT"]}/professores/1')
+        r_get = requests.get(f'{self.base_url}/professores/1', headers=headers)
 
         # Verifica se o professor ainda existe
         self.assertEqual(r_get.status_code, 200, "Professor não encontrado após atualização")
@@ -239,28 +246,30 @@ class TestStringMethods(unittest.TestCase):
         self.assertEqual(professor_atualizado["observacoes"], novos_dados["observacoes"])
         
     def test_011_turmas_PUT(self):
+        headers = {"Authorization": f"Bearer {self.token}"}
         # Define os novos dados para a turma ID 1
         novos_dados = {
-            "descricao": "Turma de Matemática",
+            "nome": "Turma de Matematica",
             "professor_id": 2,
             "ativo": False
         }
         # Faz a requisição PUT para atualizar a turma ID 1
-        r = requests.put(f'{app.config["HOST"]}:{app.config["PORT"]}/turmas/1', json=novos_dados)
+        r = requests.put(f'{self.base_url}/turmas/1', headers=headers, json=novos_dados)
         # Verifica se a atualização foi bem-sucedida (status code 200)
         self.assertEqual(r.status_code, 200, "Falha ao atualizar a turma")
         # Faz uma nova requisição GET para verificar se os dados foram atualizados
-        r_get = requests.get(f'{app.config["HOST"]}:{app.config["PORT"]}/turmas/1')
+        r_get = requests.get(f'{self.base_url}/turmas/1', headers=headers)
         # Verifica se a turma ainda existe
         self.assertEqual(r_get.status_code, 200, "Turma não encontrada após atualização")
         # Obtém o JSON retornado
         turma_atualizada = r_get.json()
         # Compara os dados atualizados com os esperados
-        self.assertEqual(turma_atualizada["descricao"], novos_dados["descricao"])
+        self.assertEqual(turma_atualizada["nome"],novos_dados["nome"])
         self.assertEqual(turma_atualizada["professor_id"], novos_dados["professor_id"])
         self.assertEqual(turma_atualizada["ativo"], novos_dados["ativo"])
         
     def test_012_alunos_PUT(self):
+        headers = {"Authorization": f"Bearer {self.token}"}
         # Define os novos dados para o aluno ID 1
         novos_dados = {
             "nome": "João Silva",
@@ -271,13 +280,13 @@ class TestStringMethods(unittest.TestCase):
         }
 
         # Faz a requisição PUT para atualizar o aluno ID 1
-        r = requests.put(f'{app.config["HOST"]}:{app.config["PORT"]}/alunos/1', json=novos_dados)
+        r = requests.put(f'{self.base_url}/alunos/1', headers=headers, json=novos_dados)
 
         # Verifica se a atualização foi bem-sucedida (status code 200)
         self.assertEqual(r.status_code, 200, "Falha ao atualizar o aluno")
 
         # Faz uma nova requisição GET para verificar se os dados foram atualizados
-        r_get = requests.get(f'{app.config["HOST"]}:{app.config["PORT"]}/alunos/1')
+        r_get = requests.get(f'{self.base_url}/alunos/1', headers=headers)
 
         # Verifica se o aluno ainda existe
         self.assertEqual(r_get.status_code, 200, "Aluno não encontrado após atualização")
@@ -293,8 +302,9 @@ class TestStringMethods(unittest.TestCase):
         self.assertEqual(aluno_atualizado["turma_id"], novos_dados["turma_id"])
         
     def test_013_professores_DELETE(self):
+        headers = {"Authorization": f"Bearer {self.token}"}
         
-        r = requests.delete(f'{app.config["HOST"]}:{app.config["PORT"]}/professores/1')
+        r = requests.delete(f'{self.base_url}/professores/1', headers=headers)
 
         self.assertEqual(r.status_code, 200, "Falha ao excluir o professor")
 
@@ -304,14 +314,15 @@ class TestStringMethods(unittest.TestCase):
         self.assertEqual(resposta["mensagem"], "Professor removido")
 
         # Faz uma nova requisição GET para verificar se o professor foi realmente excluído
-        r_get = requests.get(f'{app.config["HOST"]}:{app.config["PORT"]}/professores/1')
+        r_get = requests.get(f'{self.base_url}/professores/1', headers=headers)
 
         # Verifica se o professor não é encontrado (status code 404)
         self.assertEqual(r_get.status_code, 404, "O professor não foi excluído corretamente")
         
     def test_014_turmas_DELETE(self):
+        headers = {"Authorization": f"Bearer {self.token}"}
         # Faz a requisição DELETE para excluir o professor ID 1
-        r = requests.delete(f'{app.config["HOST"]}:{app.config["PORT"]}/turmas/1')
+        r = requests.delete(f'{self.base_url}/turmas/1', headers=headers)
 
         # Verifica se a exclusão foi bem-sucedida (status code 200)
         self.assertEqual(r.status_code, 200, "Falha ao excluir a turma")
@@ -322,14 +333,15 @@ class TestStringMethods(unittest.TestCase):
         self.assertEqual(resposta["mensagem"], "Turma removida")
 
         # Faz uma nova requisição GET para verificar se o professor foi realmente excluído
-        r_get = requests.get(f'{app.config["HOST"]}:{app.config["PORT"]}/turmas/1')
+        r_get = requests.get(f'{self.base_url}/turmas/1', headers=headers)
 
         # Verifica se o professor não é encontrado (status code 404)
         self.assertEqual(r_get.status_code, 404, "O professor não foi excluído corretamente")
         
     def test_015_alunos_DELETE(self):
+        headers = {"Authorization": f"Bearer {self.token}"}
         # Faz a requisição DELETE para excluir o professor ID 1
-        r = requests.delete(f'{app.config["HOST"]}:{app.config["PORT"]}/alunos/1')
+        r = requests.delete(f'{self.base_url}/alunos/1', headers=headers)
 
         # Verifica se a exclusão foi bem-sucedida (status code 200)
         self.assertEqual(r.status_code, 200, "Falha ao excluir o aluno")
@@ -340,7 +352,7 @@ class TestStringMethods(unittest.TestCase):
         self.assertEqual(resposta["mensagem"], "Aluno removido")
 
         # Faz uma nova requisição GET para verificar se o professor foi realmente excluído
-        r_get = requests.get(f'{app.config["HOST"]}:{app.config["PORT"]}/alunos/1')
+        r_get = requests.get(f'{self.base_url}/alunos/1', headers=headers)
 
         # Verifica se o professor não é encontrado (status code 404)
         self.assertEqual(r_get.status_code, 404, "O aluno não foi excluído corretamente")
