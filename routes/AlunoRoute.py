@@ -11,8 +11,7 @@ aluno_bp = Blueprint("aluno_bp", __name__)
 
 @aluno_bp.route('/alunos', methods=['POST'])
 @jwt_required()
-def create_aluno():
-    jwt_identity = get_jwt_identity()  
+def create_aluno():  
     jwt_claims = get_jwt()             
 
     if jwt_claims.get("role") != "admin":
@@ -27,10 +26,9 @@ def create_aluno():
 
     try:
         aluno, status = adicionar_aluno(dados, dados_turmas)
+        return jsonify(aluno), status
     except Exception as e:
         return jsonify({"erro": f"Ocorreu um erro ao adicionar o aluno: {str(e)}"}), 500
-
-    return jsonify(aluno), status
 
 @aluno_bp.route('/alunos/<int:id>', methods=['PUT'])
 @jwt_required()
@@ -50,10 +48,9 @@ def update_aluno(id):
 
     try:
         aluno, status = atualizar_aluno(id, dados, dados_turmas)
+        return jsonify(aluno), status
     except Exception as e:
         return jsonify({"erro": f"Ocorreu um erro ao atualizar o aluno: {str(e)}"}), 500
-
-    return jsonify(aluno), status
 
 @aluno_bp.route('/alunos', methods=['GET'])
 @jwt_required()
@@ -84,7 +81,6 @@ def delete_aluno(id):
 
     try:
         resultado, status = deletar_aluno(id)
+        return jsonify(resultado), status
     except Exception as e:
         return jsonify({"erro": f"Ocorreu um erro ao excluir o aluno: {str(e)}"}), 500
-
-    return jsonify(resultado), status

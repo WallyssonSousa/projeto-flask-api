@@ -34,26 +34,25 @@ def get_professor_by_id(prof_id):
 @professor_bp.route('/professores', methods=['POST'])
 @jwt_required()
 def create_professor():
+        
     jwt_claims = get_jwt()
     if jwt_claims.get("role") != "admin":
         return jsonify({"erro": "Acesso negado: apenas administradores podem criar professores"}), 403
-
+    
     dados = request.json
     campos_obrigatorios = {"nome", "data_nascimento", "disciplina", "salario", "observacoes"}
-
     erro, status = validar_campos_obrigatorios(dados, campos_obrigatorios)
     if erro:
         return jsonify(erro), status
-
     if not validar_data(dados["data_nascimento"]):
         return jsonify({"erro": "Formato de data inválido, use YYYY-MM-DD"}), 400
-
+    
     try:
         dados["idade"] = calcular_idade(dados["data_nascimento"])
         novo_professor = adicionar_professor(dados)
         return jsonify(novo_professor), 201
     except Exception as e:
-        return jsonify({"erro": f"Ocorreu um erro ao adicionar o professor: {str(e)}"}), 500
+        return jsonify({"erro": f"Ocorreu um erro ao criar um professor: {str(e)}"}), 500
 
 @professor_bp.route('/professores/<int:prof_id>', methods=['PUT'])
 @jwt_required()
@@ -71,16 +70,14 @@ def update_professor(prof_id):
     if campos_invalidos:
         return jsonify({"erro": "Campos inválidos", "campos_invalidos": campos_invalidos}), 400
 
+    professor = get_professor_por_id(prof_id)
+    if not professor:
+        return jsonify({"erro": "Professor não encontrado"}), 404
+    if "data_nascimento" in dados:
+        if not validar_data(dados["data_nascimento"]):
+            return jsonify({"erro": "Formato de data inválido, use YYYY-MM-DD"}), 400
+        dados["idade"] = calcular_idade(dados["data_nascimento"])
     try:
-        professor = get_professor_por_id(prof_id)
-        if not professor:
-            return jsonify({"erro": "Professor não encontrado"}), 404
-
-        if "data_nascimento" in dados:
-            if not validar_data(dados["data_nascimento"]):
-                return jsonify({"erro": "Formato de data inválido, use YYYY-MM-DD"}), 400
-            dados["idade"] = calcular_idade(dados["data_nascimento"])
-
         professor_atualizado = atualizar_professor(prof_id, dados)
         return jsonify(professor_atualizado), 200
     except Exception as e:
