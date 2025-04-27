@@ -86,11 +86,17 @@ O servidor será iniciado em `http://127.0.0.1:5000/`
 pytest
 ```
 
-## Próximas Fases
-1. **Fase 1:** Implementação do CRUD e testes ✅ (em andamento)
-2. **Fase 2:** Implementação das models do Projeto e Blueprint
-3. **Fase 3:** 
-4. **Fase 4:** 
+### Um exemplo da .env para que o projeto rode
+
+```
+ADMIN_USERNAME=
+ADMIN_PASSWORD=
+
+JWT_SECRET_KEY=
+SQLALCHEMY_DATABASE_URI=mysql+mysqlconnector://usuario:senha*@localhost:3306/nome_do_banco
+
+Recomendado adicionar Admin_username e Admin_password manualmente no banco. 
+```
 
 ---
 Este README será atualizado conforme o progresso do projeto. 🚀

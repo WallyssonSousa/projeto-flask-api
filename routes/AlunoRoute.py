@@ -1,9 +1,9 @@
 from flask import Blueprint, request, jsonify
-from models.AlunoModel import (
+from services.AlunoService import (
     get_todos_alunos, get_aluno_por_id, adicionar_aluno,
     atualizar_aluno, deletar_aluno
 )
-from models.TurmaModel import dados_turmas
+
 from utils.FucoesValidacao import validar_campos_obrigatorios
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 
@@ -25,7 +25,7 @@ def create_aluno():
         return jsonify(erro), status
 
     try:
-        aluno, status = adicionar_aluno(dados, dados_turmas)
+        aluno, status = adicionar_aluno(dados)
         return jsonify(aluno), status
     except Exception as e:
         return jsonify({"erro": f"Ocorreu um erro ao adicionar o aluno: {str(e)}"}), 500
@@ -47,7 +47,7 @@ def update_aluno(id):
         return jsonify({"erro": "Campos inválidos", "campos_invalidos": campos_invalidos}), 400
 
     try:
-        aluno, status = atualizar_aluno(id, dados, dados_turmas)
+        aluno, status = atualizar_aluno(id, dados)
         return jsonify(aluno), status
     except Exception as e:
         return jsonify({"erro": f"Ocorreu um erro ao atualizar o aluno: {str(e)}"}), 500
@@ -62,13 +62,9 @@ def get_alunos():
 def get_aluno_by_id(id):
     aluno = get_aluno_por_id(id)
     if aluno:
-        turma = next((t for t in dados_turmas["turmas"] if t["id"] == aluno["turma_id"]), None)
-        if turma:
-            aluno_completo = aluno.copy()
-            aluno_completo["turma"] = turma
-            return jsonify(aluno_completo)
         return jsonify(aluno)
     return jsonify({"erro": "Aluno não encontrado"}), 404
+
 
 @aluno_bp.route('/alunos/<int:id>', methods=['DELETE'])
 @jwt_required()

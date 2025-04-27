@@ -1,39 +1,25 @@
-from utils.FucoesValidacao import calcular_idade, validar_data
+from database import db
 
-dados_professores = {"professores": []}
-id_professor = 1
+class Professor(db.Model):
+    __tablename__ = 'professores'
 
-def get_todos_professores():
-    return dados_professores["professores"]
+    id = db.Column(db.Integer, primary_key=True)
+    nome = db.Column(db.String(100), nullable=False)
+    data_nascimento = db.Column(db.Date, nullable=False)
+    idade = db.Column(db.Integer, nullable=False)
+    disciplina = db.Column(db.String(100), nullable=False)
+    salario = db.Column(db.Float, nullable=False)
+    observacoes = db.Column(db.Text)
 
-def get_professor_por_id(professor_id):
-    return next((p for p in dados_professores["professores"] if p["id"] == professor_id), None)
+    turmas = db.relationship('Turma', back_populates='professor', cascade='all, delete-orphan')
 
-def adicionar_professor(professor):
-    global id_professor
-    professor["id"] = id_professor
-    professor["idade"] = calcular_idade(professor["data_nascimento"])
-    dados_professores["professores"].append(professor)
-    id_professor += 1
-    return professor
-
-def atualizar_professor(professor_id, novos_dados):
-    professor = get_professor_por_id(professor_id)
-    if not professor:
-        return None
-
-    if "data_nascimento" in novos_dados and validar_data(novos_dados["data_nascimento"]):
-        professor["data_nascimento"] = novos_dados["data_nascimento"]
-        professor["idade"] = calcular_idade(novos_dados["data_nascimento"])
-
-    for chave in novos_dados:
-        if chave not in ["id", "idade", "data_nascimento"]:
-            professor[chave] = novos_dados[chave]
-    return professor
-
-def deletar_professor(professor_id):
-    professor = get_professor_por_id(professor_id)
-    if professor:
-        dados_professores["professores"].remove(professor)
-        return True
-    return False
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "nome": self.nome,
+            "data_nascimento": self.data_nascimento.strftime('%Y-%m-%d'),
+            "idade": self.idade,
+            "disciplina": self.disciplina,
+            "salario": self.salario,
+            "observacoes": self.observacoes
+        }

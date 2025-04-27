@@ -1,29 +1,22 @@
-dados_turmas = {"turmas": []}
-id_turma = 1
+from database import db
 
-def turmas_get():
-    return dados_turmas["turmas"]
+class Turma(db.Model):
+    __tablename__ = 'turmas'
+    id = db.Column(db.Integer, primary_key=True)
+    nome = db.Column(db.String(100), nullable=False)
+    turno = db.Column(db.String(20), nullable=False)
+    ativo = db.Column(db.Boolean, default=True, nullable=False)
+    professor_id = db.Column(db.Integer, db.ForeignKey('professores.id'), nullable=False)
 
-def turma_get_id(turma_id):
-    return next((t for t in dados_turmas["turmas"] if t["id"] == turma_id), None)
+    alunos = db.relationship('Aluno', back_populates='turma', cascade='all, delete-orphan')
+    professor = db.relationship('Professor', back_populates='turmas')
 
-def turma_post(nova_turma):
-    global id_turma
-    nova_turma["id"] = id_turma
-    nova_turma["ativo"] = True
-    dados_turmas["turmas"].append(nova_turma)
-    id_turma += 1
-    return nova_turma
-
-def turma_PUT(turma_id, dados_atualizados):
-    turma = turma_get_id(turma_id)
-    if turma:
-        turma.update(dados_atualizados)
-    return turma
-
-def turma_DELETE(turma_id):
-    turma = turma_get_id(turma_id)
-    if turma:
-        dados_turmas["turmas"].remove(turma)
-        return {"mensagem": "Turma removida"}, 200
-    return {"erro": "Turma não encontrada"}, 404
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "nome": self.nome,
+            "turno": self.turno,
+            "ativo": self.ativo,
+            "professor_id": self.professor_id,
+            "professor": self.professor.to_dict() if self.professor else None
+        }
