@@ -96,6 +96,9 @@ JWT_SECRET_KEY=
 SQLALCHEMY_DATABASE_URI=mysql+mysqlconnector://usuario:senha*@localhost:3306/nome_do_banco
 
 Recomendado adicionar Admin_username e Admin_password manualmente no banco. 
+
+
+
 ```
 
 ---
