@@ -15,5 +15,20 @@ services:
       - FLASK_APP=app.py
     volumes:
       - .:/app
+    depends_on:
+      - db
 
-  #Inclusão de outros serviços quando for necessário
+  #Banco de Dados
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 12345678
+      MYSQL_DATABASE: app
+      MYSQL_USER: api
+      MYSQL_PASSWORD: 12345678
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  db_data:
