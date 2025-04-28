@@ -6,6 +6,7 @@ from routes.AlunoRoute import aluno_bp
 from routes.ProfessorRoute import professor_bp
 from routes.TurmaRoute import turma_bp
 from routes.AuthRoute import auth_bp
+from routes.ApiRoute import api_bp
 
 app = Flask(__name__)
 configure_app(app)
@@ -21,6 +22,7 @@ app.register_blueprint(auth_bp)
 app.register_blueprint(aluno_bp)
 app.register_blueprint(professor_bp)
 app.register_blueprint(turma_bp)
+app.register_blueprint(api_bp)
 
 if __name__ == "__main__":
     app.run(
