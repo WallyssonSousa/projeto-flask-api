@@ -35,7 +35,6 @@ def adicionar_aluno(dados):
 
     return novo_aluno.to_dict(), 201
 
-
 def atualizar_aluno(aluno_id, dados):
     aluno = Aluno.query.get(aluno_id)
     if not aluno:
