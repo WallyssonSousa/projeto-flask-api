@@ -7,12 +7,15 @@ from routes.ProfessorRoute import professor_bp
 from routes.TurmaRoute import turma_bp
 from routes.AuthRoute import auth_bp
 from routes.ApiRoute import api_bp
+from swagger.swagger_config import configure_swagger
 
 app = Flask(__name__)
 configure_app(app)
 
 jwt = JWTManager(app)
 db.init_app(app)
+
+configure_swagger(app)
 
 with app.app_context():
     db.create_all()
