@@ -3,16 +3,16 @@ version: '3.8'
 services:
 
   #API
-  flask-app:
+  gestao-escolar-api:
     build:
       context: .
       dockerfile: Dockerfile
-    image: flask-api:1.0
+    image: gestao-escolar-api:1.0
     ports:
       - "5000:5000"
     environment:
-      - FLASK_ENV=development
-      - FLASK_APP=app.py
+      FLASK_ENV: ${FLASK_ENV}
+      FLASK_APP: ${FLASK_APP}
     volumes:
       - .:/app
     depends_on:
@@ -20,15 +20,14 @@ services:
 
   #Banco de Dados
   db:
-    image: mysql:8.0
+    image: postgres:15
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: 12345678
-      MYSQL_DATABASE: app
-      MYSQL_USER: api
-      MYSQL_PASSWORD: 12345678
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
-      - db_data:/var/lib/mysql
+      - db_data:/var/lib/postgresql/data
 
 volumes:
   db_data:
