@@ -22,24 +22,12 @@ projeto/
 
 ## Como Rodar o Projeto (Via Docker)
 ### 🔨 Fazendo o build da imagem
-- **Usando docker build (sem docker-compose):**
-```sh
-docker build -t flask-api:1.0 .
-```
 - **Usando docker-compose build:**
 ```sh
 docker-compose build
 ```
 Isso usará o build definido no docker-compose.yml, criará a imagem flask-api:1.0 e já prepara tudo pro up.
 ### 🚀 Rodando a aplicação
-- **Usando docker (sem docker-compose):**
-```sh
-docker run -p 5000:5000 flask-api:1.0 .
-```
-ou em modo "background":
-```sh
-docker run -d -p 5000:5000 flask-api:1.0 .
-```
 - **Usando docker-compose:**
 ```sh
 docker-compose up
@@ -49,15 +37,6 @@ ou em modo "background":
 docker-compose up -d
 ```
 ### ⛔ Parando a aplicação:
-- **Usando docker (sem docker-compose):**
-```sh
-Ctrl+C
-```
-ou em modo "background":
-```sh
-docker ps
-docker stop {CONTAINER_ID}
-```
 - **Usando docker-compose:**
 ```sh
 Ctrl+C
@@ -67,11 +46,6 @@ ou em modo "background":
 docker-compose down
 ```
 ### ❌ Apagando a imagem:
-**Usando docker (sem docker-compose):**
-```sh
-docker ps
-docker rmi flask-api:1.0
-```
 **Usando docker-compose:**
 ```sh
 docker-compose down --rmi all
@@ -112,11 +86,20 @@ O servidor será iniciado em `http://127.0.0.1:5000/`
 pytest
 ```
 
-## Próximas Fases
-1. **Fase 1:** Implementação do CRUD e testes ✅ (em andamento)
-2. **Fase 2:** Implementação das models do Projeto e Blueprint
-3. **Fase 3:** 
-4. **Fase 4:** 
+### Um exemplo da .env para que o projeto rode
+
+```
+ADMIN_USERNAME=
+ADMIN_PASSWORD=
+
+JWT_SECRET_KEY=
+SQLALCHEMY_DATABASE_URI=mysql+mysqlconnector://usuario:senha*@localhost:3306/nome_do_banco
+
+Recomendado adicionar Admin_username e Admin_password manualmente no banco. 
+
+
+
+```
 
 ---
 Este README será atualizado conforme o progresso do projeto. 🚀

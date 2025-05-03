@@ -1,15 +1,22 @@
 from flask import Blueprint, request, jsonify
-from models.AlunoModel import (
+from services.AlunoService import (
     get_todos_alunos, get_aluno_por_id, adicionar_aluno,
     atualizar_aluno, deletar_aluno
 )
-from models.TurmaModel import dados_turmas
+
 from utils.FucoesValidacao import validar_campos_obrigatorios
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 
 aluno_bp = Blueprint("aluno_bp", __name__)
 
 @aluno_bp.route('/alunos', methods=['POST'])
-def create_aluno():
+@jwt_required()
+def create_aluno():  
+    jwt_claims = get_jwt()             
+
+    if jwt_claims.get("role") != "admin":
+        return jsonify({"erro": "Acesso negado: apenas administradores podem criar alunos"}), 403
+
     dados = request.json
     campos_obrigatorios = {"data_nascimento", "nome", "nota_primeiro_semestre", "nota_segundo_semestre", "turma_id"}
 
@@ -17,11 +24,21 @@ def create_aluno():
     if erro:
         return jsonify(erro), status
 
-    aluno, status = adicionar_aluno(dados, dados_turmas)
-    return jsonify(aluno), status
+    try:
+        aluno, status = adicionar_aluno(dados)
+        return jsonify(aluno), status
+    except Exception as e:
+        return jsonify({"erro": f"Ocorreu um erro ao adicionar o aluno: {str(e)}"}), 500
 
 @aluno_bp.route('/alunos/<int:id>', methods=['PUT'])
+@jwt_required()
 def update_aluno(id):
+    from flask_jwt_extended import get_jwt
+    jwt_claims = get_jwt()
+
+    if jwt_claims.get("role") != "admin":
+        return jsonify({"erro": "Acesso negado: apenas administradores podem atualizar alunos"}), 403
+
     dados = request.json
     campos_permitidos = {"data_nascimento", "nome", "nota_primeiro_semestre", "nota_segundo_semestre", "turma_id"}
 
@@ -29,26 +46,37 @@ def update_aluno(id):
     if campos_invalidos:
         return jsonify({"erro": "Campos inválidos", "campos_invalidos": campos_invalidos}), 400
 
-    aluno, status = atualizar_aluno(id, dados, dados_turmas)
-    return jsonify(aluno), status
+    try:
+        aluno, status = atualizar_aluno(id, dados)
+        return jsonify(aluno), status
+    except Exception as e:
+        return jsonify({"erro": f"Ocorreu um erro ao atualizar o aluno: {str(e)}"}), 500
 
 @aluno_bp.route('/alunos', methods=['GET'])
+@jwt_required()
 def get_alunos():
     return jsonify(get_todos_alunos())
 
 @aluno_bp.route('/alunos/<int:id>', methods=['GET'])
+@jwt_required()
 def get_aluno_by_id(id):
     aluno = get_aluno_por_id(id)
     if aluno:
-        turma = next((t for t in dados_turmas["turmas"] if t["id"] == aluno["turma_id"]), None)
-        if turma:
-            aluno_completo = aluno.copy()
-            aluno_completo["turma"] = turma
-            return jsonify(aluno_completo)
         return jsonify(aluno)
     return jsonify({"erro": "Aluno não encontrado"}), 404
 
+
 @aluno_bp.route('/alunos/<int:id>', methods=['DELETE'])
+@jwt_required()
 def delete_aluno(id):
-    resultado, status = deletar_aluno(id)
-    return jsonify(resultado), status
+    from flask_jwt_extended import get_jwt
+    jwt_claims = get_jwt()
+
+    if jwt_claims.get("role") != "admin":
+        return jsonify({"erro": "Acesso negado: apenas administradores podem excluir alunos"}), 403
+
+    try:
+        resultado, status = deletar_aluno(id)
+        return jsonify(resultado), status
+    except Exception as e:
+        return jsonify({"erro": f"Ocorreu um erro ao excluir o aluno: {str(e)}"}), 500
