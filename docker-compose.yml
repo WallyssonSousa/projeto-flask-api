@@ -20,6 +20,9 @@ services:
         ENV PYTHONUNBUFFERED=1
         # Exposição da porta que o Flask usa
         EXPOSE 5000
+        CMD ["flask", "db", "init"]
+        CMD ["flask", "db", "migrate", "-m", '"Inicialização do banco de dados"']
+        CMD ["flask", "db", "upgrade"]
         # Comando para rodar a aplicação com auto-reload
         CMD ["python", "test.py"]
         CMD ["python", "-m", "flask", "run", "--host=0.0.0.0", "--reload"]
