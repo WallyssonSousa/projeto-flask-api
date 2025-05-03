@@ -3,7 +3,7 @@ version: '3.8'
 services:
 
   #API
-  flask-app:
+  gestao-escolar-api:
     build:
       context: .
       dockerfile_inline: |
@@ -23,13 +23,27 @@ services:
         # Comando para rodar a aplicação com auto-reload
         CMD ["python", "test.py"]
         CMD ["python", "-m", "flask", "run", "--host=0.0.0.0", "--reload"]
-    image: flask-api:1.0
+    image: gestao-escolar-api:1.0
     ports:
       - "5000:5000"
     environment:
-      - FLASK_ENV=development
-      - FLASK_APP=app.py
+      FLASK_ENV: ${FLASK_ENV}
+      FLASK_APP: ${FLASK_APP}
     volumes:
       - .:/app
+    depends_on:
+      - db
 
-  #Inclusão de outros serviços quando for necessário
+  #Banco de Dados
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:
